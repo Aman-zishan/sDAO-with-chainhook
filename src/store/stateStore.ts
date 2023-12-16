@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-export const bootStrapAtom = atomWithStorage('bootStrap', 0);
+export const bootStrapAtom = atom(0);

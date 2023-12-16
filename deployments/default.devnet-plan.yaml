@@ -88,7 +88,7 @@ plan:
         - contract-publish:
             contract-name: proposal-submission
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 17700
+            cost: 18740
             path: contracts/extensions/proposal-submission.clar
             anchor-block-only: true
             clarity-version: 2

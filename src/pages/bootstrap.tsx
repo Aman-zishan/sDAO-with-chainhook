@@ -12,10 +12,11 @@ import {
   uintCV
 } from '@stacks/transactions';
 import { useAtom } from 'jotai';
-import React from 'react';
+import React, { useEffect } from 'react';
 import LeftMenu from '../components/leftMenu';
 import { bootStrapAtom } from '../store/stateStore';
 import { createClient } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 const supabase = createClient(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -27,9 +28,64 @@ const supabase = createClient(
 );
 
 const Bootstrap = () => {
-  const [step, setStep] = useAtom(bootStrapAtom);
+  const [step, setStep] = React.useState(0);
   const { openStxTokenTransfer } = useOpenStxTokenTransfer();
   const { openContractCall } = useOpenContractCall();
+
+  useEffect(() => {
+    fetchDataFromSupabase();
+  }, []);
+
+  async function fetchDataFromSupabase(): Promise<any> {
+    // Replace this with your actual Supabase fetch logic
+    // This is a placeholder for fetching data
+    try {
+      const { data, error } = await supabase.from('bootstrap').select('*');
+      if (error) throw error;
+      console.log(data);
+      if (!data.length) throw 'error';
+      return data;
+    } catch (error) {
+      console.error('Fetch error:', error);
+      throw error;
+    }
+  }
+
+  function callUntilSuccessOrTimeout(keyCondition: string): Promise<any> {
+    console.log('Calling until success or timeout', keyCondition);
+    return new Promise((resolve, reject) => {
+      const timeLimit = 120000; // 2 minutes in milliseconds
+
+      (function attemptFetch() {
+        fetchDataFromSupabase()
+          .then((result) => {
+            console.log('Result:', result);
+            if (result.length > 0) {
+              console.log(
+                'Result:',
+                result,
+                keyCondition,
+                result[0][keyCondition]
+              );
+              if (result[0][keyCondition]) {
+                console.log('Expected outcome achieved:', result);
+                resolve(result);
+              }
+            } else if (Date.now() < timeLimit) {
+              // If the time limit has not been exceeded, retry after 1 second
+              setTimeout(attemptFetch, 1000);
+            } else {
+              console.log('Time limit exceeded');
+              reject(new Error('Time limit exceeded'));
+            }
+          })
+          .catch((error) => {
+            console.log('Fetch error, exiting:', error);
+            reject(error);
+          });
+      })();
+    });
+  }
 
   const saveSubjectToDB = async (address: string, contract: string) => {
     const { error } = await supabase
@@ -41,12 +97,23 @@ const Bootstrap = () => {
     if (step === 1) {
       return;
     }
-    openStxTokenTransfer({
+    await openStxTokenTransfer({
       recipient: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.core',
       amount: 1000000000000n, //1M STX
-      memo: 'grant funds'
+      memo: 'grant funds',
+
+      onFinish: async (data: any) => {
+        console.log('finished token transfer!', data);
+        toast.promise(callUntilSuccessOrTimeout('initial_stx_transfer'), {
+          loading: 'Loading...',
+          success: (data) => {
+            setStep(1);
+            return `1M STX transferred to core contract`;
+          },
+          error: 'Time limit of 2 minutes exceeded'
+        });
+      }
     });
-    setStep(1);
   };
   const constructBootstrap = async () => {
     if (step === 2) {
@@ -69,7 +136,14 @@ const Bootstrap = () => {
 
       onFinish: async (data: any) => {
         console.log('finished contract call!', data);
-        setStep(2);
+        toast.promise(callUntilSuccessOrTimeout('contruct_bootstrap'), {
+          loading: 'Loading...',
+          success: (data) => {
+            setStep(2);
+            return `bootstrap contract constructed`;
+          },
+          error: 'Time limit of 2 minutes exceeded'
+        });
       },
       onCancel: () => {
         console.log('popup closed!');
@@ -81,6 +155,7 @@ const Bootstrap = () => {
     if (step === 3) {
       return;
     }
+    console.log('proposing milestone extension step', step);
     const functionArgs = [
       contractPrincipalCV(
         'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
@@ -104,7 +179,17 @@ const Bootstrap = () => {
           'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
           'milestone-extension-proposal'
         );
-        setStep(3);
+        toast.promise(
+          callUntilSuccessOrTimeout('proposed_milestone_extension'),
+          {
+            loading: 'Loading...',
+            success: (data) => {
+              setStep(3);
+              return `Proposed milestone extension`;
+            },
+            error: 'Time limit of 2 minutes exceeded'
+          }
+        );
       },
       onCancel: () => {
         console.log('popup closed!');
