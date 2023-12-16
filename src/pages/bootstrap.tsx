@@ -36,55 +36,21 @@ const Bootstrap = () => {
     fetchDataFromSupabase();
   }, []);
 
-  async function fetchDataFromSupabase(): Promise<any> {
+  async function fetchDataFromSupabase() {
     // Replace this with your actual Supabase fetch logic
     // This is a placeholder for fetching data
     try {
       const { data, error } = await supabase.from('bootstrap').select('*');
       if (error) throw error;
       console.log(data);
-      if (!data.length) throw 'error';
+      if (data.length > 0) {
+        setStep(data[0].current_step);
+      }
       return data;
     } catch (error) {
       console.error('Fetch error:', error);
       throw error;
     }
-  }
-
-  function callUntilSuccessOrTimeout(keyCondition: string): Promise<any> {
-    console.log('Calling until success or timeout', keyCondition);
-    return new Promise((resolve, reject) => {
-      const timeLimit = 120000; // 2 minutes in milliseconds
-
-      (function attemptFetch() {
-        fetchDataFromSupabase()
-          .then((result) => {
-            console.log('Result:', result);
-            if (result.length > 0) {
-              console.log(
-                'Result:',
-                result,
-                keyCondition,
-                result[0][keyCondition]
-              );
-              if (result[0][keyCondition]) {
-                console.log('Expected outcome achieved:', result);
-                resolve(result);
-              }
-            } else if (Date.now() < timeLimit) {
-              // If the time limit has not been exceeded, retry after 1 second
-              setTimeout(attemptFetch, 1000);
-            } else {
-              console.log('Time limit exceeded');
-              reject(new Error('Time limit exceeded'));
-            }
-          })
-          .catch((error) => {
-            console.log('Fetch error, exiting:', error);
-            reject(error);
-          });
-      })();
-    });
   }
 
   const saveSubjectToDB = async (address: string, contract: string) => {
@@ -104,14 +70,7 @@ const Bootstrap = () => {
 
       onFinish: async (data: any) => {
         console.log('finished token transfer!', data);
-        toast.promise(callUntilSuccessOrTimeout('initial_stx_transfer'), {
-          loading: 'Loading...',
-          success: (data) => {
-            setStep(1);
-            return `1M STX transferred to core contract`;
-          },
-          error: 'Time limit of 2 minutes exceeded'
-        });
+        fetchDataFromSupabase();
       }
     });
   };
@@ -136,14 +95,7 @@ const Bootstrap = () => {
 
       onFinish: async (data: any) => {
         console.log('finished contract call!', data);
-        toast.promise(callUntilSuccessOrTimeout('contruct_bootstrap'), {
-          loading: 'Loading...',
-          success: (data) => {
-            setStep(2);
-            return `bootstrap contract constructed`;
-          },
-          error: 'Time limit of 2 minutes exceeded'
-        });
+        fetchDataFromSupabase();
       },
       onCancel: () => {
         console.log('popup closed!');
@@ -155,7 +107,6 @@ const Bootstrap = () => {
     if (step === 3) {
       return;
     }
-    console.log('proposing milestone extension step', step);
     const functionArgs = [
       contractPrincipalCV(
         'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
@@ -175,21 +126,7 @@ const Bootstrap = () => {
 
       onFinish: async (data: any) => {
         console.log('finished contract call!', data);
-        saveSubjectToDB(
-          'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-          'milestone-extension-proposal'
-        );
-        toast.promise(
-          callUntilSuccessOrTimeout('proposed_milestone_extension'),
-          {
-            loading: 'Loading...',
-            success: (data) => {
-              setStep(3);
-              return `Proposed milestone extension`;
-            },
-            error: 'Time limit of 2 minutes exceeded'
-          }
-        );
+        fetchDataFromSupabase();
       },
       onCancel: () => {
         console.log('popup closed!');
