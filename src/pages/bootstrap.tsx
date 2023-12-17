@@ -11,12 +11,10 @@ import {
   stringUtf8CV,
   uintCV
 } from '@stacks/transactions';
-import { useAtom } from 'jotai';
-import React, { useEffect } from 'react';
-import LeftMenu from '../components/leftMenu';
-import { bootStrapAtom } from '../store/stateStore';
 import { createClient } from '@supabase/supabase-js';
+import React, { useEffect } from 'react';
 import { toast } from 'sonner';
+import LeftMenu from '../components/leftMenu';
 
 const supabase = createClient(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -131,76 +129,6 @@ const Bootstrap = () => {
     });
   };
 
-  const voteForMilestoneExtension = async () => {
-    if (step === 4) {
-      return;
-    }
-    const functionArgs = [
-      uintCV(100),
-      boolCV(true),
-      contractPrincipalCV(
-        'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-        'milestone-extension-proposal'
-      )
-    ];
-    await openContractCall({
-      contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-      contractName: 'proposal-voting',
-      functionName: 'vote',
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      functionArgs,
-
-      onFinish: async (data: any) => {
-        console.log('finished contract call!', data);
-        setStep(4);
-      },
-      onCancel: () => {
-        console.log('popup closed!');
-      }
-    });
-  };
-
-  const concludeMilestoneExtension = async () => {
-    if (step === 5) {
-      return;
-    }
-    const postConditions = [
-      makeContractSTXPostCondition(
-        'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-        'core',
-        FungibleConditionCode.Equal,
-        1000000000000n
-      )
-    ];
-    const functionArgs = [
-      contractPrincipalCV(
-        'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-        'milestone-extension-proposal'
-      )
-    ];
-    await openContractCall({
-      contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-      contractName: 'proposal-voting',
-      functionName: 'conclude',
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      functionArgs,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      postConditions,
-
-      onFinish: async (data: any) => {
-        console.log('finished contract call!', data);
-        setStep(5);
-      },
-      onCancel: () => {
-        console.log('popup closed!');
-      }
-    });
-  };
   return (
     <div className=" bg-blue-50 w-screen h-screen">
       <LeftMenu />
@@ -222,7 +150,7 @@ const Bootstrap = () => {
                     <div>Proposals</div>
                   </span>
                   /{' '}
-                  <span className="ml-1 text-blue-900 font-bold mr-2">
+                  <span className="ml-1 text-blue-500 font-bold mr-2">
                     all proposals
                   </span>{' '}
                   vote and conclude.

@@ -3,17 +3,15 @@ import {
   useOpenContractCall,
   useOpenContractDeploy
 } from '@micro-stacks/react';
-import React from 'react';
-import { toast } from 'sonner';
-import CodeEditor from '../components/codeEditor';
-import LeftMenu from '../components/leftMenu';
 import {
   contractPrincipalCV,
   stringAsciiCV,
   stringUtf8CV
 } from '@stacks/transactions';
-
-import { createClient } from '@supabase/supabase-js';
+import React from 'react';
+import { toast } from 'sonner';
+import CodeEditor from '../components/codeEditor';
+import LeftMenu from '../components/leftMenu';
 
 const initialContractBoilerplate = `;; This is a boilerplate contract for a grant milestone claim proposal\n
 (impl-trait .proposal-trait.proposal-trait)
