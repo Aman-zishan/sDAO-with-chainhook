@@ -193,13 +193,15 @@ const ProposalPage = () => {
           <div className="px-6 py-8">
             <div className="max-w-4xl mx-auto">
               <div className="bg-white rounded-3xl p-8 mb-5">
-                <h1 className="text-3xl font-bold mb-10">{`Proposal ${paramContractName}`}</h1>
+                <h1 className="text-3xl font-bold mb-5">
+                  {proposalInfo?.title.value}
+                </h1>
                 <br />
                 <p className="font-md text-black text-xl">
                   {proposalInfo?.description.value}
                 </p>
                 <hr className="my-10" />
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-center">
                   <div className="flex items-stretch">
                     <div className="h-100 border-l mx-4"></div>
                   </div>
@@ -211,9 +213,6 @@ const ProposalPage = () => {
                     !proposalConcluded ? (
                       <div className="flex items-center gap-x-2">
                         <input
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-ignore
-                          disabled={proposalInfo?.concluded.value}
                           required
                           type="number"
                           onChange={(e) => setVote(e.target.value)}
@@ -222,9 +221,6 @@ const ProposalPage = () => {
                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                         <select
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-ignore
-                          disabled={proposalInfo?.concluded.value}
                           required
                           onChange={(e) => setVoteFor(e.target.value)}
                           id="default-input"
@@ -235,9 +231,6 @@ const ProposalPage = () => {
                           <option value="AGAINST">AGAINST</option>
                         </select>
                         <button
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-ignore
-                          disabled={proposalInfo?.concluded.value}
                           type="button"
                           onClick={async () => {
                             voteForProposal();
@@ -247,24 +240,23 @@ const ProposalPage = () => {
                           Vote
                         </button>
                         <button
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-ignore
-                          disabled={proposalInfo?.concluded.value}
                           onClick={async () => {
                             concludeProposal();
                           }}
                           type="button"
                           className="inline-flex items-center justify-center h-9 px-5 rounded-xl bg-gray-900 text-gray-300 hover:text-white text-sm font-semibold transition"
                         >
-                          {proposalInfo?.concluded.value
-                            ? 'Concluded'
-                            : 'Conclude'}
+                          Conclude
                         </button>
                       </div>
                     ) : (
                       <span
-                        className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-red-300'
-                          text-xs font-medium me-2 px-2.5 py-0.5 rounded-full"
+                        className={`${
+                          proposalInfo?.passed.value
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }
+                          text-md font-medium px-5 py-1 rounded-full`}
                       >
                         This proposal was concluded and{' '}
                         {proposalInfo?.passed.value ? 'passed' : 'not passed'}

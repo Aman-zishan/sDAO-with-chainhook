@@ -25,20 +25,6 @@ const initialContractBoilerplate = `;; This is a boilerplate contract for a gran
 	)
 )
   `;
-const supabase = createClient(
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  import.meta.env.VITE_SUPABASE_PROJECT_URL,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
-
-const saveSubjectToDB = async (address: string, contract: string) => {
-  const { error } = await supabase
-    .from('proposals')
-    .insert({ address: address, proposal_name: contract });
-};
 
 const NewClaimProposal = () => {
   const [code, setCode] = React.useState(initialContractBoilerplate);
@@ -86,7 +72,9 @@ const NewClaimProposal = () => {
     }
 
     const functionArgs = [
-      contractPrincipalCV(stxAddress!, contractName),
+      // include keyword "claim" if user misses
+      // this is used to set postCondition while claiming the milestone fund
+      contractPrincipalCV(stxAddress!, `${contractName}-claim`),
       stringAsciiCV(title),
       stringUtf8CV(description)
     ];
@@ -101,7 +89,6 @@ const NewClaimProposal = () => {
 
       onFinish: async (data: any) => {
         console.log('finished contract call!', data);
-        saveSubjectToDB(stxAddress!, contractName);
       },
       onCancel: () => {
         console.log('popup closed!');

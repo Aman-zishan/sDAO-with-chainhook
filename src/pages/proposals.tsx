@@ -144,7 +144,7 @@ const Proposals = () => {
                   {activeTab === 'myProposals' && (
                     <div className=" gap-x-20">
                       {!proposals.length && <p>No proposals to show</p>}
-                      <div className="flex flex-col gap-5 h-[300px] max-h-[500px] overflow-hidden overflow-scroll ">
+                      <div className="flex flex-col gap-5 h-[300px] max-h-[500px] overflow-scroll overflow-x-hidden">
                         {proposals.map((proposal) => {
                           return (
                             <ProposalCard

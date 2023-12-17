@@ -54,7 +54,8 @@ const Bootstrap = () => {
   }
 
   const handleTokenTransfer = async () => {
-    if (step === 1) {
+    if (step === 1 || step === 2 || step === 3) {
+      toast.error('Already transferred');
       return;
     }
     await openStxTokenTransfer({
@@ -69,7 +70,8 @@ const Bootstrap = () => {
     });
   };
   const constructBootstrap = async () => {
-    if (step === 2) {
+    if (step === 2 || step === 3) {
+      toast.error('Already constructed');
       return;
     }
     const functionArgs = [
@@ -99,6 +101,7 @@ const Bootstrap = () => {
 
   const proposeMilestoneExtension = async () => {
     if (step === 3) {
+      toast.error('Already proposed');
       return;
     }
     const functionArgs = [

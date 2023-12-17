@@ -17,6 +17,7 @@
 (define-constant ERR_UNAUTHORIZED (err u3000))
 (define-constant ERR_BLOCK_HEIGHT_NOT_REACHED (err u3001))
 (define-constant ERR_NO_MILESTONE_FOUND (err u3002))
+(define-constant ERR_MILESTONE_ALREADY_CLAIMED (err u3003))
 
 ;; data vars
 ;;
@@ -25,7 +26,7 @@
 ;;
 (define-map grants
   principal
-  { milestones: (list 10 { id: uint, start-height: uint, end-height: uint, amount: uint }) }
+  { milestones: (list 10 { id: uint, start-height: uint, end-height: uint, amount: uint, claimed: bool }) }
 )
 
 ;; Internal DAO functions
@@ -42,7 +43,7 @@
 
         (map-set grants
           proposal
-          { milestones: (unwrap-panic (as-max-len? (append existing-milestones milestone) u10)) }
+          { milestones: (unwrap-panic (as-max-len? (append existing-milestones (merge milestone {claimed: false})) u10)) }
         )
 
       (ok true)
@@ -57,13 +58,16 @@
       (milestone (unwrap! (get-milestone proposal milestone-id) ERR_NO_MILESTONE_FOUND))
       (end-height (get end-height milestone))
       (amount (get amount milestone))
+      (claimed (get claimed milestone))
 
     )
     (try! (is-dao-or-extension))
     ;; checks if the milestone end-height is reached
     (asserts! (> block-height end-height) ERR_BLOCK_HEIGHT_NOT_REACHED)
+    (asserts! (not claimed) ERR_MILESTONE_ALREADY_CLAIMED)
     ;; transfers the STX funds to recipient
     (try! (as-contract (stx-transfer? amount tx-sender recipient)))
+    (merge milestone {claimed: true})
     (ok true)
   )
 )
@@ -89,8 +93,8 @@
 ;;
 
 (define-private (find-milestone 
-    (milestone { id: uint, start-height: uint, end-height: uint, amount: uint })
-    (state { found: (optional { id: uint, start-height: uint, end-height: uint, amount: uint }), id: uint })
+    (milestone { id: uint, start-height: uint, end-height: uint, amount: uint, claimed: bool })
+    (state { found: (optional { id: uint, start-height: uint, end-height: uint, amount: uint, claimed:bool }), id: uint })
     )
 
     (if (is-eq (get id milestone) (get id state))
