@@ -2,6 +2,9 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
+const WebSocket = require('ws');
+const http = require('http');
+
 require('dotenv').config();
 const createClient = require('@supabase/supabase-js').createClient;
 
@@ -9,12 +12,25 @@ const supabase = createClient(
   process.env.VITE_SUPABASE_PROJECT_URL,
   process.env.VITE_SUPABASE_ANON_KEY
 );
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+// Function to send message to all connected WebSocket clients
+const broadcast = (data) => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      console.log('SENDING MESSAGE TO CLIENT :::', data);
+      client.send(JSON.stringify(data));
+    }
+  });
+};
 
 app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
   console.log('=====================================');
   console.log('STX INITIAL TRANSFER');
   console.log('=====================================');
   const events = req.body;
+  let chainState = false;
   let currentStep = 0;
   const { data: currentData, error: currentDataError } = await supabase
     .from('bootstrap')
@@ -38,6 +54,7 @@ app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
             // Log the operation
             console.log(operation.status);
             if (operation.status === 'SUCCESS') {
+              chainState = true;
               console.log('successful STX transfer');
               const { error } = await supabase.from('bootstrap').upsert({
                 id: 1,
@@ -53,8 +70,14 @@ app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
     });
   }
 
+  if (chainState) {
+    broadcast({ message: 'STX transfer successful!', type: 'success' });
+  } else {
+    broadcast({ message: 'STX transfer error!', type: 'error' });
+  }
+
   // Send a response back to Chainhook to acknowledge receipt of the event
-  res.status(200).send({ message: 'STX transfer done!' });
+  res.status(200).send({ message: 'message received' });
 });
 
 app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
@@ -63,6 +86,7 @@ app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
   console.log('CONSTRUCT CALL');
   console.log('=====================================');
   console.log(events);
+  let chainState = false;
   const { data: currentData, error: currentDataError } = await supabase
     .from('bootstrap')
     .select('current_step')
@@ -82,6 +106,7 @@ app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
             console.log(operation);
             console.log(operation.status);
             if (operation.status === 'SUCCESS') {
+              chainState = true;
               const { data: responseData, error } = await supabase
                 .from('bootstrap')
                 .upsert({
@@ -100,22 +125,34 @@ app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
     console.log('Current step is 3 or higher, not updating to 2');
   }
 
+  if (chainState) {
+    broadcast({
+      message: 'bootstrap construct function invoked!',
+      type: 'success'
+    });
+  } else {
+    broadcast({ message: 'something went wrong!', type: 'error' });
+  }
+
   // Send a response back to Chainhook to acknowledge receipt of the event
-  res.status(200).send({ message: 'contruct function called!' });
+  res.status(200).send({ message: 'message received' });
 });
 
 app.post('/api/chainhook/proposal-submission', async (req, res) => {
   const events = req.body;
   console.log('=====================================');
-  console.log('EXTENSION PROPOSAL');
+  console.log('PROPOSAL SUBMISSION');
   console.log('=====================================');
   console.log(events);
+
+  let chainState = false;
 
   events.apply.forEach(async (item) => {
     // Loop through each transaction in the item
     console.log('TX ITEM LENGTH::', item.transactions.length);
     item.transactions.forEach(async (transaction) => {
       if (transaction.metadata.success) {
+        chainState = true;
         console.log('EVENTS::', transaction.metadata.description);
         const regex = /\((.*?)\)/;
         const match = transaction.metadata.description.match(regex);
@@ -150,10 +187,91 @@ app.post('/api/chainhook/proposal-submission', async (req, res) => {
     });
   });
 
+  if (chainState) {
+    broadcast({
+      message: 'new proposal submitted!',
+      type: 'success'
+    });
+  } else {
+    broadcast({ message: 'something went wrong!', type: 'error' });
+  }
+
   // Send a response back to Chainhook to acknowledge receipt of the event
-  res.status(200).send({ message: 'milestone extension proposed!' });
+  res.status(200).send({ message: 'message received' });
 });
 
-app.listen(3000, () => {
+app.post('/api/chainhook/proposal-vote', async (req, res) => {
+  const events = req.body;
+  console.log('=====================================');
+  console.log('PROPOSAL VOTE');
+  console.log('=====================================');
+  console.log(events);
+
+  let chainState = false;
+  let voteNumber = 0;
+
+  events.apply.forEach(async (item) => {
+    // Loop through each transaction in the item
+    console.log('TX ITEM LENGTH::', item.transactions.length);
+    item.transactions.forEach(async (transaction) => {
+      if (transaction.metadata.success) {
+        console.log('EVENTS::', transaction.metadata.description);
+        chainState = true;
+        const match = transaction.metadata.description.match(/::vote\(u(\d+),/);
+        if (match && match[1]) {
+          voteNumber = parseInt(match[1], 10);
+        }
+      }
+    });
+  });
+
+  if (chainState) {
+    broadcast({
+      message: `${voteNumber} votes cast on proposal`,
+      type: 'success'
+    });
+  } else {
+    broadcast({ message: 'something went wrong!', type: 'error' });
+  }
+
+  // Send a response back to Chainhook to acknowledge receipt of the event
+  res.status(200).send({ message: 'message received' });
+});
+
+app.post('/api/chainhook/proposal-conclude', async (req, res) => {
+  const events = req.body;
+  console.log('=====================================');
+  console.log('PROPOSAL CONCLUDE');
+  console.log('=====================================');
+  console.log(events);
+
+  let chainState = false;
+
+  events.apply.forEach(async (item) => {
+    // Loop through each transaction in the item
+    console.log('TX ITEM LENGTH::', item.transactions.length);
+    item.transactions.forEach(async (transaction) => {
+      if (transaction.metadata.success) {
+        console.log('EVENTS::', transaction.metadata.description);
+
+        chainState = true;
+      }
+    });
+  });
+
+  if (chainState) {
+    broadcast({
+      message: ' proposal concluded!',
+      type: 'success'
+    });
+  } else {
+    broadcast({ message: 'something went wrong!', type: 'error' });
+  }
+
+  // Send a response back to Chainhook to acknowledge receipt of the event
+  res.status(200).send({ message: 'message received' });
+});
+
+server.listen(3000, () => {
   console.log('Server is running on port 3000');
 });

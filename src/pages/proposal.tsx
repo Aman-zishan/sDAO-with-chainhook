@@ -13,6 +13,8 @@ import {
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import LeftMenu from '../components/leftMenu';
+import useWebSocket from 'react-use-websocket';
+import { toast } from 'sonner';
 
 type individualValue = {
   type: string;
@@ -42,6 +44,22 @@ const ProposalPage = () => {
   const [milestoneInfo, setMilestoneInfo] = React.useState<any>([]);
   const [loading, setLoading] = React.useState(true);
   const [proposalConcluded, setProposalConcluded] = React.useState(false);
+
+  const { lastMessage } = useWebSocket('ws://localhost:3000');
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const data = JSON.parse(lastMessage.data);
+      console.log('Message from Server:', data.message);
+      if (data.type === 'success') {
+        toast.success(data.message);
+      } else if (data.type === 'error') {
+        toast.error(data.message);
+      }
+
+      // Handle the message as needed (e.g., update state, UI)
+    }
+  }, [lastMessage]);
 
   const { openContractCall } = useOpenContractCall();
 

@@ -8,10 +8,11 @@ import {
   stringAsciiCV,
   stringUtf8CV
 } from '@stacks/transactions';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { toast } from 'sonner';
 import CodeEditor from '../components/codeEditor';
 import LeftMenu from '../components/leftMenu';
+import useWebSocket from 'react-use-websocket';
 
 const initialContractBoilerplate = `;; This is a boilerplate contract for a grant milestone claim proposal\n
 (impl-trait .proposal-trait.proposal-trait)
@@ -31,6 +32,22 @@ const NewClaimProposal = () => {
   const [description, setDescription] = React.useState('');
   const [response, setResponse] = React.useState('');
   const [deployed, setDeployed] = React.useState(false);
+
+  const { lastMessage } = useWebSocket('ws://localhost:3000');
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const data = JSON.parse(lastMessage.data);
+      console.log('Message from Server:', data.message);
+      if (data.type === 'success') {
+        toast.success(data.message);
+      } else if (data.type === 'error') {
+        toast.error(data.message);
+      }
+
+      // Handle the message as needed (e.g., update state, UI)
+    }
+  }, [lastMessage]);
 
   const { openContractCall, isRequestPending: isProposeReqPending } =
     useOpenContractCall();

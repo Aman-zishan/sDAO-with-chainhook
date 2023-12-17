@@ -15,6 +15,7 @@ import { createClient } from '@supabase/supabase-js';
 import React, { useEffect } from 'react';
 import { toast } from 'sonner';
 import LeftMenu from '../components/leftMenu';
+import useWebSocket from 'react-use-websocket';
 
 const supabase = createClient(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -29,6 +30,22 @@ const Bootstrap = () => {
   const [step, setStep] = React.useState(0);
   const { openStxTokenTransfer } = useOpenStxTokenTransfer();
   const { openContractCall } = useOpenContractCall();
+
+  const { lastMessage } = useWebSocket('ws://localhost:3000');
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const data = JSON.parse(lastMessage.data);
+      console.log('Message from Server:', data.message);
+      if (data.type === 'success') {
+        toast.success(data.message);
+      } else if (data.type === 'error') {
+        toast.error(data.message);
+      }
+
+      // Handle the message as needed (e.g., update state, UI)
+    }
+  }, [lastMessage]);
 
   useEffect(() => {
     fetchDataFromSupabase();

@@ -1,6 +1,6 @@
 # sDAO WITH CHAINHOOKS 🔗🪝
 
-<img width="1440" alt="Screenshot 2023-12-14 at 5 34 15 AM" src="./assets/Untitled-2023-12-05-1121.png">
+<img width="1440" alt="Screenshot 2023-12-14 at 5 34 15 AM" src="./assets/architecture.png">
 
 
 

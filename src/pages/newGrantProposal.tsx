@@ -8,10 +8,11 @@ import {
   stringAsciiCV,
   stringUtf8CV
 } from '@stacks/transactions';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { toast } from 'sonner';
 import CodeEditor from '../components/codeEditor';
 import LeftMenu from '../components/leftMenu';
+import useWebSocket from 'react-use-websocket';
 
 const initialContractBoilerplate = `;; This is a boilerplate contract for a grant proposal 
 
@@ -39,6 +40,23 @@ const NewGrantProposal = () => {
 
   const { openContractDeploy, isRequestPending } = useOpenContractDeploy();
   const { stxAddress } = useAccount();
+
+  const { lastMessage } = useWebSocket('ws://localhost:3000');
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const data = JSON.parse(lastMessage.data);
+      console.log('Message from Server:', data.message);
+      if (data.type === 'success') {
+        toast.success(data.message);
+      } else if (data.type === 'error') {
+        toast.error(data.message);
+      }
+
+      // Handle the message as needed (e.g., update state, UI)
+    }
+  }, [lastMessage]);
+
   const handleCodeChange = (code) => {
     console.log('Code in parent component:', code);
     setCode(code);

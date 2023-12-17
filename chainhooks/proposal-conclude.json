@@ -1,18 +1,18 @@
 {
   "chain": "stacks",
   "uuid": "1",
-  "name": "new proposal",
+  "name": "proposal conclude",
   "version": 1,
   "networks": {
     "devnet": {
       "if_this": {
-        "scope": "print_event",
-        "contract_identifier": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.proposal-submission",
-        "contains": "action"
+        "scope": "contract_call",
+        "contract_identifier": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.proposal-voting",
+        "method": "conclude"
       },
       "then_that": {
         "http_post": {
-          "url": "http://localhost:3000/api/chainhook/proposal-submission",
+          "url": "http://localhost:3000/api/chainhook/proposal-conclude",
           "authorization_header": "Bearer 12345"
         }
       },

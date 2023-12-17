@@ -22,7 +22,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
     network={devnet}
   >
     <React.StrictMode>
-      <Toaster richColors />
+      <Toaster richColors position="top-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
