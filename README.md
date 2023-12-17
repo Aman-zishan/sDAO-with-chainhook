@@ -1,16 +1,18 @@
-# sDAO
+# sDAO WITH CHAINHOOKS 🔗🪝
+
+<img width="1440" alt="Screenshot 2023-12-14 at 5 34 15 AM" src="./assets/Untitled-2023-12-05-1121.png">
+
+
 
 milestone based funded decentralized grants program
 
 features:
 
-- Smart contract automated fund claim process
-- Proper ownership access control
-- Supports multiple milestones
-- Claiming flow is a proposal and proof of work can be submitted as a smart contract
-- Easy to use UI for deployer and members to setup DAO
-- Write and deploy within the app
-- Clarity syntax highlight 
+build on top of sDAO
+
+- Boostrap process now hooked with chainhook to know for sure if chain states were changed
+- Server side database insertion for chainhook events instead of assuming request went through
+
 
 # short video demo (7 mins)
 
