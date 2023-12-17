@@ -12,7 +12,7 @@
       },
       "then_that": {
         "http_post": {
-          "url": "http://localhost:3000/api/chainhook/bootstrap/propose-extension",
+          "url": "http://localhost:3000/api/chainhook/proposal-submission",
           "authorization_header": "Bearer 12345"
         }
       },

@@ -104,7 +104,7 @@ app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
   res.status(200).send({ message: 'contruct function called!' });
 });
 
-app.post('/api/chainhook/bootstrap/propose-extension', async (req, res) => {
+app.post('/api/chainhook/proposal-submission', async (req, res) => {
   const events = req.body;
   console.log('=====================================');
   console.log('EXTENSION PROPOSAL');
