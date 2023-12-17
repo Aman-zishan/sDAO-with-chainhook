@@ -1,20 +1,18 @@
-import React, { useEffect } from 'react';
-import LeftMenu from '../components/leftMenu';
-import { useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { useAccount, useAuth, useOpenContractCall } from '@micro-stacks/react';
 import {
-  contractPrincipalCV,
-  callReadOnlyFunction,
-  cvToValue,
   boolCV,
+  callReadOnlyFunction,
+  contractPrincipalCV,
+  cvToValue,
   uintCV
 } from '@stacks/transactions';
 import {
-  makeStandardSTXPostCondition,
-  makeContractSTXPostCondition,
-  FungibleConditionCode
+  FungibleConditionCode,
+  makeContractSTXPostCondition
 } from 'micro-stacks/transactions';
-import { useAccount, useAuth, useOpenContractCall } from '@micro-stacks/react';
-import { truncateAddress } from '../lib/utils';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import LeftMenu from '../components/leftMenu';
 
 type individualValue = {
   type: string;
@@ -42,6 +40,8 @@ const ProposalPage = () => {
   const { stxAddress } = useAccount();
   const [proposalInfo, setProposalInfo] = React.useState<ProposalType>();
   const [milestoneInfo, setMilestoneInfo] = React.useState<any>();
+  const [loading, setLoading] = React.useState(true);
+  const [proposalConcluded, setProposalConcluded] = React.useState(false);
 
   const { openContractCall } = useOpenContractCall();
 
@@ -71,12 +71,21 @@ const ProposalPage = () => {
   };
 
   const concludeProposal = async () => {
-    const postConditions = [
+    const claimPostConditions = [
       makeContractSTXPostCondition(
         'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
         'milestone-extension',
         FungibleConditionCode.GreaterEqual,
         1n
+      )
+    ];
+
+    const mileStoneExtensionPostConditions = [
+      makeContractSTXPostCondition(
+        'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+        'core',
+        FungibleConditionCode.Equal,
+        1000000000000n
       )
     ];
     const functionArgs = [
@@ -92,8 +101,10 @@ const ProposalPage = () => {
       //@ts-ignore
       functionArgs,
 
-      postConditions: paramContractName?.includes('claim')
-        ? postConditions
+      postConditions: paramContractName?.includes('milestone-extension')
+        ? mileStoneExtensionPostConditions
+        : paramContractName?.includes('claim')
+        ? claimPostConditions
         : undefined,
 
       onFinish: async (data: any) => {
@@ -105,7 +116,7 @@ const ProposalPage = () => {
     });
   };
 
-  const fetchProposalInfo = async (address: string, contractName: string) => {
+  const fetchInitialInfo = async (address: string, contractName: string) => {
     if (isSignedIn) {
       try {
         const functionArgs = [contractPrincipalCV(address, contractName)];
@@ -119,22 +130,7 @@ const ProposalPage = () => {
         });
 
         console.log(cvToValue(result).value);
-        setProposalInfo(cvToValue(result).value);
-      } catch (error) {
-        console.error('Failed to fetch balance:', error);
-      }
-    }
-  };
-
-  const fetchProposalMilestoneInfo = async (
-    address: string,
-    contractName: string
-  ) => {
-    console.log('fetching milestones', address, contractName);
-    if (isSignedIn) {
-      try {
-        const functionArgs = [contractPrincipalCV(address, contractName)];
-        const result = await callReadOnlyFunction({
+        const milestoneResult = await callReadOnlyFunction({
           network: 'devnet',
           contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
           contractName: 'milestone-extension',
@@ -143,17 +139,47 @@ const ProposalPage = () => {
           senderAddress: stxAddress!
         });
 
-        console.log(cvToValue(result));
-        setMilestoneInfo(cvToValue(result));
+        if (cvToValue(result).value.concluded.value === true) {
+          setProposalConcluded(true);
+        }
+
+        setProposalInfo(cvToValue(result).value);
+        setMilestoneInfo(cvToValue(milestoneResult));
+        setLoading(false);
       } catch (error) {
         console.error('Failed to fetch balance:', error);
       }
     }
   };
 
+  // const fetchProposalMilestoneInfo = async (
+  //   address: string,
+  //   contractName: string
+  // ) => {
+  //   console.log('fetching milestones', address, contractName);
+  //   if (isSignedIn) {
+  //     try {
+  //       const functionArgs = [contractPrincipalCV(address, contractName)];
+  //       const result = await callReadOnlyFunction({
+  //         network: 'devnet',
+  //         contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  //         contractName: 'milestone-extension',
+  //         functionName: 'get-milestones',
+  //         functionArgs,
+  //         senderAddress: stxAddress!
+  //       });
+
+  //       console.log('MILESTONE ::', cvToValue(result));
+  //       setMilestoneInfo(cvToValue(result));
+  //     } catch (error) {
+  //       console.error('Failed to fetch balance:', error);
+  //     }
+  //   }
+  // };
+
   useEffect(() => {
-    fetchProposalInfo(paramAddress!, paramContractName!);
-    fetchProposalMilestoneInfo(paramAddress!, paramContractName!);
+    fetchInitialInfo(paramAddress!, paramContractName!);
+    // fetchProposalMilestoneInfo(paramAddress!, paramContractName!);
   }, []);
 
   return (
@@ -161,119 +187,158 @@ const ProposalPage = () => {
       <LeftMenu />
 
       <main className="ml-60 pt-16 max-h-screen overflow-auto">
-        <div className="px-6 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-3xl p-8 mb-5">
-              <h1 className="text-3xl font-bold mb-10">{`Proposal ${paramContractName}`}</h1>
-
-              <hr className="my-10" />
-              <div className="flex items-center justify-between">
-                <div className="flex items-stretch">
-                  <div className="h-100 border-l mx-4"></div>
-                </div>
-                <div className="flex items-center gap-x-2">
-                  <input
-                    required
-                    type="number"
-                    onChange={(e) => setVote(e.target.value)}
-                    id="default-input"
-                    placeholder="vote number"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                  <select
-                    required
-                    onChange={(e) => setVoteFor(e.target.value)}
-                    id="default-input"
-                    placeholder="vote number"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="FOR">FOR</option>
-                    <option value="AGAINST">AGAINST</option>
-                  </select>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      voteForProposal();
-                    }}
-                    className="inline-flex items-center justify-center h-9 px-5 rounded-xl bg-gray-900 text-gray-300 hover:text-white text-sm font-semibold transition"
-                  >
-                    Vote
-                  </button>
-                  <button
-                    onClick={async () => {
-                      concludeProposal();
-                    }}
-                    type="button"
-                    className="inline-flex items-center justify-center h-9 px-5 rounded-xl bg-gray-900 text-gray-300 hover:text-white text-sm font-semibold transition"
-                  >
-                    Conclude
-                  </button>
-                </div>
-              </div>
-
-              <hr className="my-10" />
-
-              <div className="grid grid-cols gap-x-20">
-                <div>
-                  <h2 className="text-2xl font-bold mb-4">Stats</h2>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-2">
-                      <div className="p-4 bg-green-100 rounded-xl">
-                        <div className="font-bold text-xl text-gray-800 leading-none">
-                          Proposer:
-                        </div>
-                        <div className="mt-5">
-                          <button
-                            type="button"
-                            className="inline-flex items-center justify-center py-2 px-3 rounded-xl bg-white text-gray-800 hover:text-green-500 text-sm font-semibold transition"
-                          >
-                            {proposalInfo?.proposer.value}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-blue-100 rounded-xl text-gray-800">
-                      <div className="font-bold text-2xl leading-none">
-                        {proposalInfo?.['votes-for'].value}
-                      </div>
-                      <div className="mt-2 font-bold">FOR Votes</div>
-                    </div>
-                    <div className="p-4 bg-yellow-100 rounded-xl text-gray-800">
-                      <div className="font-bold text-2xl leading-none">
-                        {proposalInfo?.['votes-against'].value}
-                      </div>
-                      <div className="mt-2 font-bold">AGAINST Votes</div>
-                    </div>
+        {loading ? (
+          'loading'
+        ) : (
+          <div className="px-6 py-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-3xl p-8 mb-5">
+                <h1 className="text-3xl font-bold mb-10">{`Proposal ${paramContractName}`}</h1>
+                <br />
+                <p className="font-md text-black text-xl">
+                  {proposalInfo?.description.value}
+                </p>
+                <hr className="my-10" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-stretch">
+                    <div className="h-100 border-l mx-4"></div>
                   </div>
+
+                  {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    //@ts-ignore
+
+                    !proposalConcluded ? (
+                      <div className="flex items-center gap-x-2">
+                        <input
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-ignore
+                          disabled={proposalInfo?.concluded.value}
+                          required
+                          type="number"
+                          onChange={(e) => setVote(e.target.value)}
+                          id="default-input"
+                          placeholder="vote number"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                        <select
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-ignore
+                          disabled={proposalInfo?.concluded.value}
+                          required
+                          onChange={(e) => setVoteFor(e.target.value)}
+                          id="default-input"
+                          placeholder="vote number"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
+                          <option value="FOR">FOR</option>
+                          <option value="AGAINST">AGAINST</option>
+                        </select>
+                        <button
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-ignore
+                          disabled={proposalInfo?.concluded.value}
+                          type="button"
+                          onClick={async () => {
+                            voteForProposal();
+                          }}
+                          className="inline-flex items-center justify-center h-9 px-5 rounded-xl bg-gray-900 text-gray-300 hover:text-white text-sm font-semibold transition"
+                        >
+                          Vote
+                        </button>
+                        <button
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-ignore
+                          disabled={proposalInfo?.concluded.value}
+                          onClick={async () => {
+                            concludeProposal();
+                          }}
+                          type="button"
+                          className="inline-flex items-center justify-center h-9 px-5 rounded-xl bg-gray-900 text-gray-300 hover:text-white text-sm font-semibold transition"
+                        >
+                          {proposalInfo?.concluded.value
+                            ? 'Concluded'
+                            : 'Conclude'}
+                        </button>
+                      </div>
+                    ) : (
+                      <span
+                        className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-red-300'
+                          text-xs font-medium me-2 px-2.5 py-0.5 rounded-full"
+                      >
+                        This proposal was concluded and{' '}
+                        {proposalInfo?.passed.value ? 'passed' : 'not passed'}
+                      </span>
+                    )
+                  }
                 </div>
 
-                {milestoneInfo && (
+                <hr className="my-10" />
+
+                <div className="grid grid-cols gap-x-20">
                   <div>
-                    <h2 className="text-2xl font-bold mb-4 mt-4">
-                      Milestones ({milestoneInfo.length})
-                    </h2>
-                    <div className="flex flex-col h-[200px] max-h-[500px] overflow-scroll gap-10">
-                      {milestoneInfo.map((milestone: any) => (
-                        <div className="grid grid-cols gap-4">
-                          <div className="flex p-4 bg-blue-200 rounded-xl text-gray-800 gap-5">
-                            <div className="font-bold text-xl leading-none">
-                              milestone ID : {milestone.value.id.value}
-                            </div>
-                            <div className="font-bold text-xl leading-none">
-                              Amount : {milestone.value.amount.value / 1000000}{' '}
-                              STX
-                            </div>
+                    <h2 className="text-2xl font-bold mb-4">Stats</h2>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <div className="p-4 bg-green-100 rounded-xl">
+                          <div className="font-bold text-xl text-gray-800 leading-none">
+                            Proposer:
+                          </div>
+                          <div className="mt-5">
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center py-2 px-3 rounded-xl bg-white text-gray-800 hover:text-green-500 text-sm font-semibold transition"
+                            >
+                              {proposalInfo?.proposer.value}
+                            </button>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                      <div className="p-4 bg-blue-100 rounded-xl text-gray-800">
+                        <div className="font-bold text-2xl leading-none">
+                          {proposalInfo?.['votes-for'].value}
+                        </div>
+                        <div className="mt-2 font-bold">FOR Votes</div>
+                      </div>
+                      <div className="p-4 bg-yellow-100 rounded-xl text-gray-800">
+                        <div className="font-bold text-2xl leading-none">
+                          {proposalInfo?.['votes-against'].value}
+                        </div>
+                        <div className="mt-2 font-bold">AGAINST Votes</div>
+                      </div>
                     </div>
                   </div>
-                )}
+
+                  {milestoneInfo.length ? (
+                    <div>
+                      <h2 className="text-2xl font-bold mb-4 mt-4">
+                        Milestones ({milestoneInfo.length})
+                      </h2>
+                      <div className="flex flex-col h-[200px] max-h-[500px] overflow-scroll gap-10">
+                        {milestoneInfo.map((milestone: any) => (
+                          <div className="grid grid-cols gap-4">
+                            <div className="flex p-4 bg-blue-200 rounded-xl text-gray-800 gap-5">
+                              <div className="font-bold text-xl leading-none">
+                                milestone ID : {milestone.value.id.value}
+                              </div>
+                              <div className="font-bold text-xl leading-none">
+                                Amount :{' '}
+                                {milestone.value.amount.value / 1000000} STX
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
     </body>
   );

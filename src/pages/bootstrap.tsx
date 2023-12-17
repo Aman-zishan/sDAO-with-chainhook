@@ -53,12 +53,6 @@ const Bootstrap = () => {
     }
   }
 
-  const saveSubjectToDB = async (address: string, contract: string) => {
-    const { error } = await supabase
-      .from('proposals')
-      .insert({ address: address, proposal_name: contract });
-  };
-
   const handleTokenTransfer = async () => {
     if (step === 1) {
       return;
@@ -213,20 +207,28 @@ const Bootstrap = () => {
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-3xl p-8 mb-5">
               <h1 className="text-3xl font-bold mb-5">Setup sDAO</h1>
-              <div className="pb-5">
-                <p>
-                  Bootstrap the DAO by enabling extensions and passing milestone
-                  proposals
+              <div className="mb-[45px] gap-2">
+                <p className="text-md mb-5">
+                  Bootstrap the DAO by enabling extensions and proposing
+                  milestone proposal.
+                </p>
+                <p className="flex flex-row text-md mb-5">
+                  After completing theses steps go to
+                  <span className="ml-1 mr-1 flex flex-row gap-1 font-bold">
+                    <img src="/assets/proposals.png" alt="" width={20} />
+                    <div>Proposals</div>
+                  </span>
+                  /{' '}
+                  <span className="ml-1 text-blue-900 font-bold mr-2">
+                    all proposals
+                  </span>{' '}
+                  vote and conclude.
                 </p>
               </div>
 
               <ol className="ml-5 relative text-gray-500 border-s border-gray-200 dark:border-gray-700 dark:text-gray-400">
                 <li onClick={handleTokenTransfer} className="mb-10 ms-6">
-                  {step === 1 ||
-                  step === 2 ||
-                  step === 3 ||
-                  step === 4 ||
-                  step === 5 ? (
+                  {step === 1 || step === 2 || step === 3 ? (
                     <span className="absolute flex items-center justify-center w-8 h-8 bg-green-200 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-green-900">
                       <svg
                         className="w-3.5 h-3.5 text-green-500 dark:text-green-400"
@@ -269,7 +271,7 @@ const Bootstrap = () => {
                   }}
                   className="mb-10 ms-6"
                 >
-                  {step === 2 || step === 3 || step === 4 || step === 5 ? (
+                  {step === 2 || step === 3 ? (
                     <span className="absolute flex items-center justify-center w-8 h-8 bg-green-200 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-green-900">
                       <svg
                         className="w-3.5 h-3.5 text-green-500 dark:text-green-400"
@@ -311,7 +313,7 @@ const Bootstrap = () => {
                   }}
                   className="mb-10 ms-6"
                 >
-                  {step === 3 || step === 4 || step === 5 ? (
+                  {step === 3 ? (
                     <span className="absolute flex items-center justify-center w-8 h-8 bg-green-200 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-green-900">
                       <svg
                         className="w-3.5 h-3.5 text-green-500 dark:text-green-400"
@@ -346,90 +348,6 @@ const Bootstrap = () => {
                     Propose milestone extension
                   </h3>
                   <p className="text-sm">propose new extension</p>
-                </li>
-                <li
-                  onClick={async () => {
-                    voteForMilestoneExtension();
-                  }}
-                  className="mb-10 ms-6"
-                >
-                  {step === 4 || step === 5 ? (
-                    <span className="absolute flex items-center justify-center w-8 h-8 bg-green-200 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-green-900">
-                      <svg
-                        className="w-3.5 h-3.5 text-green-500 dark:text-green-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 16 12"
-                      >
-                        <path
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M1 5.917 5.724 10.5 15 1.5"
-                        />
-                      </svg>
-                    </span>
-                  ) : (
-                    <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-gray-700">
-                      <svg
-                        className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 18 20"
-                      >
-                        <path d="M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z" />
-                      </svg>
-                    </span>
-                  )}
-                  <h3 className="font-medium leading-tight">
-                    Vote for milestone extension
-                  </h3>
-                  <p className="text-sm">vote for milestone extension</p>
-                </li>
-                <li
-                  onClick={async () => {
-                    await concludeMilestoneExtension();
-                  }}
-                  className="ms-6"
-                >
-                  {step === 5 ? (
-                    <span className="absolute flex items-center justify-center w-8 h-8 bg-green-200 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-green-900">
-                      <svg
-                        className="w-3.5 h-3.5 text-green-500 dark:text-green-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 16 12"
-                      >
-                        <path
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M1 5.917 5.724 10.5 15 1.5"
-                        />
-                      </svg>
-                    </span>
-                  ) : (
-                    <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-gray-700">
-                      <svg
-                        className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 18 20"
-                      >
-                        <path d="M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z" />
-                      </svg>
-                    </span>
-                  )}
-                  <h3 className="font-medium leading-tight">
-                    Conclude milestone extension
-                  </h3>
-                  <p className="text-sm">enable milestone extension</p>
                 </li>
               </ol>
             </div>

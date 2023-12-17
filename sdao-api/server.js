@@ -15,29 +15,43 @@ app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
   console.log('STX INITIAL TRANSFER');
   console.log('=====================================');
   const events = req.body;
-  // Loop through each item in the apply array
-  events.apply.forEach(async (item) => {
-    // Loop through each transaction in the item
-    item.transactions.forEach(async (transaction) => {
-      // If the transaction has operations, loop through them
-      if (transaction.operations) {
-        transaction.operations.forEach(async (operation) => {
-          // Log the operation
-          console.log(operation.status);
-          if (operation.status === 'SUCCESS') {
-            console.log('successful STX transfer');
-            const { error } = await supabase.from('bootstrap').upsert({
-              id: 1,
-              current_step: 1
-            });
-            if (error) {
-              console.log(error);
+  let currentStep = 0;
+  const { data: currentData, error: currentDataError } = await supabase
+    .from('bootstrap')
+    .select('current_step')
+    .eq('id', 1)
+    .single();
+
+  if (!currentDataError) {
+    currentStep = currentData.current_step;
+    //return res.status(500).send({ message: 'Error fetching current step' });
+  }
+
+  if (!(currentStep > 1)) {
+    // Loop through each item in the apply array
+    events.apply.forEach(async (item) => {
+      // Loop through each transaction in the item
+      item.transactions.forEach(async (transaction) => {
+        // If the transaction has operations, loop through them
+        if (transaction.operations) {
+          transaction.operations.forEach(async (operation) => {
+            // Log the operation
+            console.log(operation.status);
+            if (operation.status === 'SUCCESS') {
+              console.log('successful STX transfer');
+              const { error } = await supabase.from('bootstrap').upsert({
+                id: 1,
+                current_step: 1
+              });
+              if (error) {
+                console.log(error);
+              }
             }
-          }
-        });
-      }
+          });
+        }
+      });
     });
-  });
+  }
 
   // Send a response back to Chainhook to acknowledge receipt of the event
   res.status(200).send({ message: 'STX transfer done!' });
@@ -60,7 +74,7 @@ app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
     //return res.status(500).send({ message: 'Error fetching current step' });
   }
   const currentStep = currentData.current_step;
-  if (currentStep < 3) {
+  if (!(currentStep > 2)) {
     events.apply.forEach(async (item) => {
       item.transactions.forEach(async (transaction) => {
         if (transaction.operations) {
@@ -96,7 +110,7 @@ app.post('/api/chainhook/bootstrap/propose-extension', async (req, res) => {
   console.log('EXTENSION PROPOSAL');
   console.log('=====================================');
   console.log(events);
-  // Loop through each item in the apply array
+
   events.apply.forEach(async (item) => {
     // Loop through each transaction in the item
     console.log('TX ITEM LENGTH::', item.transactions.length);
