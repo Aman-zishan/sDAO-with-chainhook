@@ -74,7 +74,7 @@ const NewClaimProposal = () => {
     const functionArgs = [
       // include keyword "claim" if user misses
       // this is used to set postCondition while claiming the milestone fund
-      contractPrincipalCV(stxAddress!, `${contractName}-claim`),
+      contractPrincipalCV(stxAddress!, contractName),
       stringAsciiCV(title),
       stringUtf8CV(description)
     ];
@@ -127,9 +127,12 @@ const NewClaimProposal = () => {
                   <input
                     required
                     type="text"
-                    onChange={(e) => setContractName(e.target.value)}
+                    onChange={(e) => {
+                      const milestoneContractName = 'claim-' + e.target.value;
+                      setContractName(milestoneContractName);
+                    }}
                     id="default-input"
-                    placeholder="Grant name"
+                    placeholder="milestone contract name"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>

@@ -25,7 +25,7 @@ plan:
         - contract-publish:
             contract-name: core
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 22660
+            cost: 22710
             path: contracts/core.clar
             anchor-block-only: true
             clarity-version: 2
@@ -46,7 +46,7 @@ plan:
         - contract-publish:
             contract-name: milestone-extension
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 26090
+            cost: 25550
             path: contracts/extensions/milestone-extension.clar
             anchor-block-only: true
             clarity-version: 2

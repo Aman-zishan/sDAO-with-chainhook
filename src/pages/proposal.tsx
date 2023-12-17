@@ -39,7 +39,7 @@ const ProposalPage = () => {
   const { isSignedIn } = useAuth();
   const { stxAddress } = useAccount();
   const [proposalInfo, setProposalInfo] = React.useState<ProposalType>();
-  const [milestoneInfo, setMilestoneInfo] = React.useState<any>();
+  const [milestoneInfo, setMilestoneInfo] = React.useState<any>([]);
   const [loading, setLoading] = React.useState(true);
   const [proposalConcluded, setProposalConcluded] = React.useState(false);
 
@@ -130,21 +130,21 @@ const ProposalPage = () => {
         });
 
         console.log(cvToValue(result).value);
-        const milestoneResult = await callReadOnlyFunction({
-          network: 'devnet',
-          contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-          contractName: 'milestone-extension',
-          functionName: 'get-milestones',
-          functionArgs,
-          senderAddress: stxAddress!
-        });
+        // const milestoneResult = await callReadOnlyFunction({
+        //   network: 'devnet',
+        //   contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+        //   contractName: 'milestone-extension',
+        //   functionName: 'get-milestones',
+        //   functionArgs,
+        //   senderAddress: stxAddress!
+        // });
 
         if (cvToValue(result).value.concluded.value === true) {
           setProposalConcluded(true);
         }
 
         setProposalInfo(cvToValue(result).value);
-        setMilestoneInfo(cvToValue(milestoneResult));
+        // setMilestoneInfo(cvToValue(milestoneResult));
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch balance:', error);

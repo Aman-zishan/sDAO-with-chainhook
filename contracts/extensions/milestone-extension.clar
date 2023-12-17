@@ -25,8 +25,8 @@
 ;; data maps
 ;;
 (define-map grants
-  principal
-  { milestones: (list 10 { id: uint, start-height: uint, end-height: uint, amount: uint, claimed: bool }) }
+  {owner: principal, milestoneId: uint}
+  { start-height: uint, end-height: uint, amount: uint, claimed: bool }
 )
 
 ;; Internal DAO functions
@@ -38,12 +38,22 @@
 ;; #[allow(unchecked_params)]
 ;; #[allow(unchecked_data)]
 (define-public (set-milestone (proposal principal) (milestone { id: uint, start-height: uint, end-height: uint, amount: uint }))
-  (let ((existing-milestones (get-milestones proposal)))
+  (begin 
         (try! (is-dao-or-extension))
 
-        (map-set grants
-          proposal
-          { milestones: (unwrap-panic (as-max-len? (append existing-milestones (merge milestone {claimed: false})) u10)) }
+        (map-insert grants 
+          {
+            owner: proposal, 
+            milestoneId: (get id milestone)
+          } 
+          (merge 
+          { 
+            start-height: (get start-height milestone),
+            end-height: (get end-height milestone), 
+            amount: (get amount milestone)
+          } 
+          {claimed: false}
+          )
         )
 
       (ok true)
@@ -67,7 +77,14 @@
     (asserts! (not claimed) ERR_MILESTONE_ALREADY_CLAIMED)
     ;; transfers the STX funds to recipient
     (try! (as-contract (stx-transfer? amount tx-sender recipient)))
-    (merge milestone {claimed: true})
+    (map-set grants
+      {
+        owner: proposal, 
+        milestoneId: milestone-id
+      } 
+      (merge milestone {claimed: true})
+    )
+    
     (ok true)
   )
 )
@@ -75,30 +92,10 @@
 ;; public functions
 ;;
 
+(define-read-only (get-milestone (proposal principal) (milestone-id uint))
+  (map-get? grants {owner: proposal, milestoneId: milestone-id})
+)
+
 (define-public (callback (sender principal) (memo (buff 34)))
     (ok true)
-)
-
-;; read only functions
-;;
-(define-read-only (get-milestone (proposal principal) (id uint))
-  (get found (fold find-milestone (get-milestones proposal) { found: none, id: id }))
-)
-
-(define-read-only (get-milestones (proposal principal))
-  (default-to (list) (get milestones (map-get? grants proposal)))
-)
-
-;; private functions
-;;
-
-(define-private (find-milestone 
-    (milestone { id: uint, start-height: uint, end-height: uint, amount: uint, claimed: bool })
-    (state { found: (optional { id: uint, start-height: uint, end-height: uint, amount: uint, claimed:bool }), id: uint })
-    )
-
-    (if (is-eq (get id milestone) (get id state))
-      { found: (some milestone), id: (get id state) }
-      state
-    )
 )

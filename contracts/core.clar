@@ -37,6 +37,7 @@
     (asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
     (var-set executive (as-contract tx-sender))
     (as-contract (execute proposal sender))
+    
   )
 )
 
