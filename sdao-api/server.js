@@ -2,6 +2,8 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
+var cors = require('cors');
+app.use(cors({ origin: '*' }));
 const WebSocket = require('ws');
 const http = require('http');
 
@@ -24,6 +26,10 @@ const broadcast = (data) => {
     }
   });
 };
+
+app.get('', (req, res) => {
+  res.send('Hello from sDAO server!');
+});
 
 app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
   console.log('=====================================');

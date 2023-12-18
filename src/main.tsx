@@ -12,6 +12,7 @@ import { Toaster } from 'sonner';
 import Proposals from './pages/proposals';
 import Bootstrap from './pages/bootstrap';
 import ProposalPage from './pages/proposal';
+import ServerStatus from './components/serverStatus';
 
 const devnet = new StacksMocknet({ coreApiUrl: 'http://localhost:3999' });
 
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
   >
     <React.StrictMode>
       <Toaster richColors position="top-right" />
+
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
@@ -34,5 +36,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
         </Routes>
       </BrowserRouter>
     </React.StrictMode>
+
+    <ServerStatus />
   </MicroStacks.ClientProvider>
 );

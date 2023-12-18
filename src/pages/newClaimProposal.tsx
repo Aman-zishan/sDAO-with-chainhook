@@ -112,7 +112,7 @@ const NewClaimProposal = () => {
   };
 
   return (
-    <div className=" bg-blue-50 w-screen">
+    <div className=" bg-blue-50 w-screen h-screen">
       <LeftMenu />
 
       <main className="ml-60 pt-10 ">

@@ -54,7 +54,7 @@ const CodeEditor = ({ onCodeChange, initialCode }: any) => {
 
   return (
     <Editor
-      height="50vh"
+      height="45vh"
       theme="vs-dark"
       defaultLanguage="clarity" // Set to use the custom Clarity language
       defaultValue={initialCode}

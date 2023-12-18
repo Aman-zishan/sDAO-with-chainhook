@@ -113,7 +113,7 @@ const NewGrantProposal = () => {
   };
 
   return (
-    <div className=" bg-blue-50 w-screen">
+    <div className=" bg-blue-50 w-screen h-screen">
       <LeftMenu />
 
       <main className="ml-60 pt-10 ">
@@ -124,8 +124,7 @@ const NewGrantProposal = () => {
               <div className="pb-5">
                 <p>
                   You can propose a new grant by deploying a contract containing
-                  your idea and milestones. You can write and deploy a contract
-                  from here.
+                  your idea and milestones
                 </p>
                 <p>
                   You can set milestones for your project and allocate funds.
