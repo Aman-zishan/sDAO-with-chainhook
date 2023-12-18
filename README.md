@@ -11,17 +11,22 @@ features:
 build on top of [sDAO](https://github.com/Aman-zishan/sDAO
 )
 
-- Boostrap process now hooked with chainhook to know for sure if transaction went through
-- notification service by making use of websocket to notify user about the chain state change
+- Contract tests
+- Server status badges (sDAO server and devnet)
+- Server hooked with chainhook to know for sure if transaction went through
+- notification service by making use of websocket to notify frontend about the chain state change
 - Server side database insertion for chainhook events instead of assuming request went through
-- alerts the user if the trasaction went through or not (which was assumed in sDAO)
+- alerts the user if the trasaction went through or not
 
 
 # short video demo (7 mins)
 
-link: https://youtu.be/aDuB2fzSNM8
+sDAO with chainhooks demo link: https://youtu.be/aDuB2fzSNM8
 
-<img width="1440" alt="Screenshot 2023-12-14 at 5 34 15 AM" src="https://github.com/Aman-zishan/sDAO/assets/55238388/649be4be-768b-4299-b96e-bacbc1307def">
+sDAO demo link: https://youtu.be/aDuB2fzSNM8
+
+<img width="1440" alt="Screenshot 2023-12-18 at 8 50 00 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/a36e84f6-d1da-42c9-827b-3903fadb3410">
+
 
 ## Getting Started
 
@@ -48,7 +53,7 @@ In a new terminal session run the command:
 
 ## Demo
 
-<img width="1440" alt="Screenshot 2023-12-14 at 5 34 26 AM" src="https://github.com/Aman-zishan/sDAO/assets/55238388/94346b94-2aec-4dad-9dee-66012ce0f24e">
+![Untitled-2023-12-05-1121](https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/405cb6d4-1556-4a79-a771-2eab501af5ba)
 
 
 1. Connect the deployer wallet to the application
@@ -61,9 +66,11 @@ In a new terminal session run the command:
 
 7. click on `conclude` to conclude and execute the proposal
 
-8. once succcesfull go ahead and repeat the process for claiming the milestone, make sure to change the `contract` in boilerplate `.grant-proposal` to your newly deployed grant contract
+8. once successful go ahead and repeat the process for claiming the milestone, make sure to change the `contract` in boilerplate `.grant-proposal` to your newly deployed grant contract
 
 9. vote and conclude just like grant proposal
 
 10. You should be able to see the stx transfer event from the contract wallet to the provided recipient
+
+11. During each transaction you should be able to see the hooks triggered and server logs like shown in the above screenshot
    
