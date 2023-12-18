@@ -22,6 +22,7 @@ build on top of [sDAO](https://github.com/Aman-zishan/sDAO
 # short video demo (7 mins)
 
 sDAO with chainhooks demo link: https://youtu.be/aDuB2fzSNM8
+
 sDAO demo link: https://youtu.be/aDuB2fzSNM8
 
 <img width="1440" alt="Screenshot 2023-12-18 at 8 50 00 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/a36e84f6-d1da-42c9-827b-3903fadb3410">
