@@ -38,6 +38,10 @@ To get the application running, follow these steps:
 3. Start the development server: `yarn dev`
 4. In another terminal run the server: `node sdao-api/server.js` (should be run from root directory)
 
+## Tests
+
+Run `yarn test` to run the contract tests
+
 ## Setup
 
 Before getting into testing the application you need to spin up the devnet. This applications uses devnet to interact with the smart contract. To spin up the devnet, follow these steps:
