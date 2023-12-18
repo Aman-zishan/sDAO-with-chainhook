@@ -72,7 +72,7 @@ const NewClaimProposal = () => {
       onFinish: async (data: any) => {
         console.log('finished contract deploy!', data);
         setResponse(data);
-        toast(`contract ${contractName} deployed!`);
+        toast.success(`contract ${contractName} deployed!`);
         setDeployed(true);
       },
       onCancel: () => {

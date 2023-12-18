@@ -46,16 +46,17 @@
 
 (define-public (propose (proposal <proposal-trait>) (title (string-ascii 50)) (description (string-utf8 500)))
   (begin
-    (let ((response (contract-call? .proposal-voting add-proposal proposal
-        {
-          start-block-height: block-height,
-          end-block-height: (+ block-height (try! (get-parameter "proposal-duration"))),
-          proposer: tx-sender,
-          title: title,
-          description: description
-        })))
-      (print {action: "propose", proposal-contract: proposal})
+    (try! (contract-call? .proposal-voting add-proposal proposal
+            {
+              start-block-height: block-height,
+              end-block-height: (+ block-height (try! (get-parameter "proposal-duration"))),
+              proposer: tx-sender,
+              title: title,
+              description: description
+            }
+          )
     )
+    (print {action: "propose", proposal-contract: proposal})
     (ok true)
   )
 )

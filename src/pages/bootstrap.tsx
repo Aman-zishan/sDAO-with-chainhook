@@ -3,19 +3,15 @@ import {
   useOpenStxTokenTransfer
 } from '@micro-stacks/react';
 import {
-  FungibleConditionCode,
-  boolCV,
   contractPrincipalCV,
-  makeContractSTXPostCondition,
   stringAsciiCV,
-  stringUtf8CV,
-  uintCV
+  stringUtf8CV
 } from '@stacks/transactions';
 import { createClient } from '@supabase/supabase-js';
 import React, { useEffect } from 'react';
+import useWebSocket from 'react-use-websocket';
 import { toast } from 'sonner';
 import LeftMenu from '../components/leftMenu';
-import useWebSocket from 'react-use-websocket';
 
 const supabase = createClient(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -42,8 +38,6 @@ const Bootstrap = () => {
       } else if (data.type === 'error') {
         toast.error(data.message);
       }
-
-      // Handle the message as needed (e.g., update state, UI)
     }
   }, [lastMessage]);
 
@@ -54,6 +48,7 @@ const Bootstrap = () => {
   async function fetchDataFromSupabase() {
     // Replace this with your actual Supabase fetch logic
     // This is a placeholder for fetching data
+
     try {
       const { data, error } = await supabase.from('bootstrap').select('*');
       if (error) throw error;
@@ -80,7 +75,7 @@ const Bootstrap = () => {
 
       onFinish: async (data: any) => {
         console.log('finished token transfer!', data);
-        fetchDataFromSupabase();
+        await fetchDataFromSupabase();
       }
     });
   };
@@ -106,7 +101,7 @@ const Bootstrap = () => {
 
       onFinish: async (data: any) => {
         console.log('finished contract call!', data);
-        fetchDataFromSupabase();
+        await fetchDataFromSupabase();
       },
       onCancel: () => {
         console.log('popup closed!');
@@ -138,7 +133,7 @@ const Bootstrap = () => {
 
       onFinish: async (data: any) => {
         console.log('finished contract call!', data);
-        fetchDataFromSupabase();
+        await fetchDataFromSupabase();
       },
       onCancel: () => {
         console.log('popup closed!');
@@ -160,7 +155,7 @@ const Bootstrap = () => {
                   Bootstrap the DAO by enabling extensions and proposing
                   milestone proposal.
                 </p>
-                <p className="flex flex-row text-md mb-5">
+                <div className="flex flex-row text-md mb-5">
                   After completing theses steps go to
                   <span className="ml-1 mr-1 flex flex-row gap-1 font-bold">
                     <img src="/assets/proposals.png" alt="" width={20} />
@@ -171,7 +166,7 @@ const Bootstrap = () => {
                     all proposals
                   </span>{' '}
                   vote and conclude.
-                </p>
+                </div>
               </div>
 
               <ol className="ml-5 relative text-gray-500 border-s border-gray-200 dark:border-gray-700 dark:text-gray-400">
@@ -187,9 +182,9 @@ const Bootstrap = () => {
                       >
                         <path
                           stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M1 5.917 5.724 10.5 15 1.5"
                         />
                       </svg>
@@ -230,9 +225,9 @@ const Bootstrap = () => {
                       >
                         <path
                           stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M1 5.917 5.724 10.5 15 1.5"
                         />
                       </svg>

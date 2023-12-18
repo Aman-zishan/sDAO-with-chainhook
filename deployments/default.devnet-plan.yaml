@@ -25,7 +25,7 @@ plan:
         - contract-publish:
             contract-name: core
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 22710
+            cost: 23130
             path: contracts/core.clar
             anchor-block-only: true
             clarity-version: 2
@@ -81,14 +81,14 @@ plan:
         - contract-publish:
             contract-name: proposal-voting
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 38470
+            cost: 38560
             path: contracts/extensions/proposal-voting.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: proposal-submission
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 18740
+            cost: 18990
             path: contracts/extensions/proposal-submission.clar
             anchor-block-only: true
             clarity-version: 2

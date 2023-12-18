@@ -36,7 +36,8 @@
     )
     (asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
     (var-set executive (as-contract tx-sender))
-    (as-contract (execute proposal sender))
+    (try! (as-contract (execute proposal sender)))
+    (ok true)
     
   )
 )
@@ -56,7 +57,8 @@
     (try! (is-self-or-extension))
     (asserts! (map-insert executedProposals (contract-of proposal) block-height) ERR_ALREADY_EXECUTED)
     (print {event: "execute", proposal: proposal})
-    (as-contract (contract-call? proposal execute sender))
+    (try! (as-contract (contract-call? proposal execute sender)))
+    (ok true)
   )
 )
 

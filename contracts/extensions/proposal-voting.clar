@@ -79,7 +79,8 @@
         (merge proposal-data {votes-against: (+ (get votes-against proposal-data) amount)})
       )
     )
-    (ok (print {event: "vote", proposal: proposal, voter: tx-sender, for: for, amount: amount}))
+    (print {event: "vote", proposal: proposal, voter: tx-sender, for: for, amount: amount})
+    (ok true)
   )
 )
 
