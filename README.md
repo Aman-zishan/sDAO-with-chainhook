@@ -21,7 +21,8 @@ build on top of [sDAO](https://github.com/Aman-zishan/sDAO
 
 link: https://youtu.be/aDuB2fzSNM8
 
-<img width="1440" alt="Screenshot 2023-12-14 at 5 34 15 AM" src="https://github.com/Aman-zishan/sDAO/assets/55238388/649be4be-768b-4299-b96e-bacbc1307def">
+<img width="1440" alt="Screenshot 2023-12-18 at 8 50 00 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/a36e84f6-d1da-42c9-827b-3903fadb3410">
+
 
 ## Getting Started
 
@@ -48,7 +49,7 @@ In a new terminal session run the command:
 
 ## Demo
 
-<img width="1440" alt="Screenshot 2023-12-14 at 5 34 26 AM" src="https://github.com/Aman-zishan/sDAO/assets/55238388/94346b94-2aec-4dad-9dee-66012ce0f24e">
+<img width="1440" alt="Screenshot 2023-12-18 at 8 39 13 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/75c92ae9-b882-4295-93e1-31cff4660b52">
 
 
 1. Connect the deployer wallet to the application
@@ -66,4 +67,6 @@ In a new terminal session run the command:
 9. vote and conclude just like grant proposal
 
 10. You should be able to see the stx transfer event from the contract wallet to the provided recipient
+
+11. During each transaction you should be able to see the hooks triggered and server logs like shown in the above screenshot
    
