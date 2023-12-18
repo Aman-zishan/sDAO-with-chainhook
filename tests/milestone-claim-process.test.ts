@@ -2,7 +2,9 @@ import { Cl, cvToJSON } from '@stacks/transactions';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 const accounts = simnet.getAccounts();
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const deployer = accounts.get('deployer')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const address1 = accounts.get('wallet_1')!;
 
 describe('sDAO milestone claim process', () => {

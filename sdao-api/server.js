@@ -78,8 +78,6 @@ app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
 
   if (chainState) {
     broadcast({ message: 'STX transfer successful!', type: 'success' });
-  } else {
-    broadcast({ message: 'STX transfer error!', type: 'error' });
   }
 
   // Send a response back to Chainhook to acknowledge receipt of the event

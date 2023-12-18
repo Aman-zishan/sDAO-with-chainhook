@@ -2,12 +2,14 @@ import { Cl, cvToJSON } from '@stacks/transactions';
 import { describe, expect, it } from 'vitest';
 
 const accounts = simnet.getAccounts();
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const deployer = accounts.get('deployer')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const address1 = accounts.get('wallet_1')!;
 
 describe('sDAO bootstrap flow test', () => {
   it('transfer initial grant fund of 1 million STX', () => {
-    const initialSTX = simnet.transferSTX(
+    simnet.transferSTX(
       1000000000000n,
       'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.core',
       deployer
