@@ -13,8 +13,8 @@ build on top of [sDAO](https://github.com/Aman-zishan/sDAO
 
 - Contract tests
 - Server status badges (sDAO server and devnet)
-- Boostrap process now hooked with chainhook to know for sure if transaction went through
-- notification service by making use of websocket to notify user about the chain state change
+- Server hooked with chainhook to know for sure if transaction went through
+- notification service by making use of websocket to notify frontend about the chain state change
 - Server side database insertion for chainhook events instead of assuming request went through
 - alerts the user if the trasaction went through or not
 
