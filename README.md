@@ -52,7 +52,7 @@ In a new terminal session run the command:
 
 ## Demo
 
-<img width="1440" alt="Screenshot 2023-12-18 at 8 39 13 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/75c92ae9-b882-4295-93e1-31cff4660b52">
+![Untitled-2023-12-05-1121](https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/405cb6d4-1556-4a79-a771-2eab501af5ba)
 
 
 1. Connect the deployer wallet to the application
@@ -65,7 +65,7 @@ In a new terminal session run the command:
 
 7. click on `conclude` to conclude and execute the proposal
 
-8. once succcesfull go ahead and repeat the process for claiming the milestone, make sure to change the `contract` in boilerplate `.grant-proposal` to your newly deployed grant contract
+8. once successful go ahead and repeat the process for claiming the milestone, make sure to change the `contract` in boilerplate `.grant-proposal` to your newly deployed grant contract
 
 9. vote and conclude just like grant proposal
 
