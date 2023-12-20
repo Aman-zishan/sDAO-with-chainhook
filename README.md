@@ -2,8 +2,6 @@
 
 <img width="1440" alt="Screenshot 2023-12-14 at 5 34 15 AM" src="./assets/architecture.png">
 
-
-
 milestone based funded decentralized grants program
 
 features:
@@ -25,7 +23,12 @@ sDAO with chainhooks demo link: https://youtu.be/KWVWjxDbCxw
 
 sDAO demo link: https://youtu.be/aDuB2fzSNM8
 
-<img width="1440" alt="Screenshot 2023-12-18 at 8 50 00 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/a36e84f6-d1da-42c9-827b-3903fadb3410">
+Bootstrap screen             |  Write and deploy new proposals screen
+:-------------------------:|:-------------------------:
+<img width="1440" alt="Screenshot 2023-12-18 at 8 50 00 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/a36e84f6-d1da-42c9-827b-3903fadb3410">  |  <img width="1440" alt="Screenshot 2023-12-20 at 4 49 50 PM" src="https://github.com/Aman-zishan/sDAO-with-chainhook/assets/55238388/c5a092f5-7b09-495c-84ee-726e38d007d7">
+
+
+
 
 
 ## Getting Started
