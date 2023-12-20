@@ -1,7 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import LeftMenu from '../components/leftMenu';
 import ProposalCard from './proposalCard';
-import { createClient } from '@supabase/supabase-js';
 import { useAccount, useAuth } from '@micro-stacks/react';
 import {
   callReadOnlyFunction,
@@ -37,14 +36,6 @@ const Tab: FC<{
     {children}
   </li>
 );
-const supabase = createClient(
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  import.meta.env.VITE_SUPABASE_PROJECT_URL,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 const Proposals = () => {
   const [activeTab, setActiveTab] =
@@ -77,12 +68,21 @@ const Proposals = () => {
   };
 
   const fetchAllProposals = async () => {
-    const { data, error, status } = await supabase.from('proposals').select();
-    const proposalList: proposalType[] = [];
+    const options = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    };
+
+    const response = await fetch(
+      'http://localhost:3000/api/proposals',
+      options
+    );
+    const data = await response.json();
+
     console.log(data);
-    if (status === 200) {
+    if (data) {
       const result = await Promise.all(
-        data!.map(async (proposal) => {
+        data.map(async (proposal) => {
           const proposalData = await fetchProposalInfo(
             proposal.address,
             proposal.proposal_name
@@ -95,8 +95,6 @@ const Proposals = () => {
             description: proposalData.description.value,
             title: proposalData.title.value
           };
-
-          //return proposalList;
         })
       );
 

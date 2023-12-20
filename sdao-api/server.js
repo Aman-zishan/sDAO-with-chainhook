@@ -31,6 +31,32 @@ app.get('', (req, res) => {
   res.send('Hello from sDAO server!');
 });
 
+// return the current step of the bootstrap process
+app.get('/api/current-step', async (req, res) => {
+  const { data: currentData, error: currentDataError } = await supabase
+    .from('bootstrap')
+    .select('*');
+
+  if (currentDataError) {
+    console.error('Error fetching current step:', currentDataError);
+    return res.status(500).send({ message: 'Error fetching current step' });
+  }
+
+  res.send(currentData);
+});
+
+// returns a list of all proposals
+app.get('/api/proposals', async (req, res) => {
+  const { data: proposals, error } = await supabase
+    .from('proposals')
+    .select('*');
+  if (error) {
+    console.log(error);
+  }
+  res.send(proposals);
+});
+
+// triggers when an STX transfer has occurred
 app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
   console.log('=====================================');
   console.log('STX INITIAL TRANSFER');
@@ -76,6 +102,7 @@ app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
     });
   }
 
+  // broadcast the message to frontend
   if (chainState) {
     broadcast({ message: 'STX transfer successful!', type: 'success' });
   }
@@ -84,6 +111,7 @@ app.post('/api/chainhook/bootstrap/stx-transfer', async (req, res) => {
   res.status(200).send({ message: 'message received' });
 });
 
+// triggers when core contract construct function is invoked
 app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
   const events = req.body;
   console.log('=====================================');
@@ -111,12 +139,10 @@ app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
             console.log(operation.status);
             if (operation.status === 'SUCCESS') {
               chainState = true;
-              const { data: responseData, error } = await supabase
-                .from('bootstrap')
-                .upsert({
-                  id: 1,
-                  current_step: 2
-                });
+              const { error } = await supabase.from('bootstrap').upsert({
+                id: 1,
+                current_step: 2
+              });
               if (error) {
                 console.log(error);
               }
@@ -142,6 +168,7 @@ app.post('/api/chainhook/bootstrap/construct-call', async (req, res) => {
   res.status(200).send({ message: 'message received' });
 });
 
+// triggers when a proposal is submitted
 app.post('/api/chainhook/proposal-submission', async (req, res) => {
   const events = req.body;
   console.log('=====================================');
@@ -204,6 +231,7 @@ app.post('/api/chainhook/proposal-submission', async (req, res) => {
   res.status(200).send({ message: 'message received' });
 });
 
+// triggers when a proposal is voted on
 app.post('/api/chainhook/proposal-vote', async (req, res) => {
   const events = req.body;
   console.log('=====================================');
@@ -242,6 +270,7 @@ app.post('/api/chainhook/proposal-vote', async (req, res) => {
   res.status(200).send({ message: 'message received' });
 });
 
+// triggers when a proposal is concluded
 app.post('/api/chainhook/proposal-conclude', async (req, res) => {
   const events = req.body;
   console.log('=====================================');

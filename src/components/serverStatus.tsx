@@ -46,7 +46,7 @@ const ServerStatus: React.FC = () => {
 
   if (isServerActive === true) {
     serverStatusText = 'Online';
-    serverStatusColor = 'teal';
+    serverStatusColor = 'green';
   } else if (isServerActive === false) {
     serverStatusText = 'Offline';
     serverStatusColor = 'red';
@@ -54,7 +54,7 @@ const ServerStatus: React.FC = () => {
 
   if (isDevnetActive === true) {
     devnetStatusText = 'Online';
-    devnetStatusColor = 'teal';
+    devnetStatusColor = 'green';
   } else if (isDevnetActive === false) {
     devnetStatusText = 'Offline';
     devnetStatusColor = 'red';

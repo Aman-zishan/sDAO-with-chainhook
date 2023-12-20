@@ -7,20 +7,10 @@ import {
   stringAsciiCV,
   stringUtf8CV
 } from '@stacks/transactions';
-import { createClient } from '@supabase/supabase-js';
 import React, { useEffect } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { toast } from 'sonner';
 import LeftMenu from '../components/leftMenu';
-
-const supabase = createClient(
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  import.meta.env.VITE_SUPABASE_PROJECT_URL,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 const Bootstrap = () => {
   const [step, setStep] = React.useState(0);
@@ -50,9 +40,18 @@ const Bootstrap = () => {
     // This is a placeholder for fetching data
 
     try {
-      const { data, error } = await supabase.from('bootstrap').select('*');
-      if (error) throw error;
-      console.log(data);
+      const options = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      };
+
+      const response = await fetch(
+        'http://localhost:3000/api/current-step',
+        options
+      );
+
+      const data = await response.json();
+
       if (data.length > 0) {
         setStep(data[0].current_step);
       }
@@ -267,9 +266,9 @@ const Bootstrap = () => {
                       >
                         <path
                           stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M1 5.917 5.724 10.5 15 1.5"
                         />
                       </svg>
